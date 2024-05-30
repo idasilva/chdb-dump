@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/idasilva/chdb-dump/pkg/context"
 	"github.com/idasilva/chdb-dump/pkg/dump"
 	"github.com/spf13/cobra"
 )
 
 type backupOpts struct {
+	persistence string
 }
 
 type backupCmd struct {
@@ -34,7 +36,10 @@ func newBackupCmd() *backupCmd {
 		Args:          cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			bkp, err := dump.New(backup.opts)
+			bkp, err := dump.New(&context.Context{
+				Persistence: backup.opts.persistence,
+			})
+
 			if err != nil {
 				return err
 			}
@@ -44,6 +49,9 @@ func newBackupCmd() *backupCmd {
 			return nil
 		},
 	}
+
+	cmd.PersistentFlags().StringVarP(&backup.opts.persistence,
+		"persistence", "p", "local", "where you need to pull your data")
 
 	backup.cmd = cmd
 	return backup
