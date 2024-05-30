@@ -33,6 +33,8 @@ func newRootCmd() *rootCmd {
 
 	cmd.AddCommand(
 		newCheckCmd().cmd,
+		newBackupCmd().cmd,
+		newRestoreCmd().cmd,
 	)
 	root.cmd = cmd
 	return root
