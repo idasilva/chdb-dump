@@ -3,10 +3,10 @@ package persistence
 type Local struct {
 }
 
-func Store() {
+func (l *Local) Store() {
 
 }
 
-func NewLocal() *Local {
+func NewLocal() Storage {
 	return &Local{}
 }
