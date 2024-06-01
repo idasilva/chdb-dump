@@ -5,5 +5,5 @@ const (
 )
 
 type Storage interface {
-	Store()
+	Store(docs string) error
 }

@@ -36,7 +36,7 @@ func newBackupCmd() *backupCmd {
 		Args:          cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			bkp, err := dump.New(&context.Context{
+			dump, err := dump.New(&context.Context{
 				Persistence: backup.opts.persistence,
 			})
 
@@ -44,7 +44,10 @@ func newBackupCmd() *backupCmd {
 				return err
 			}
 
-			bkp.Store()
+			err = dump.Exec()
+			if err != nil {
+				return err
+			}
 
 			return nil
 		},

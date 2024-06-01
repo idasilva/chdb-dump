@@ -1,8 +1,7 @@
 package dump
 
 import (
-	"time"
-
+	"github.com/idasilva/chdb-dump/pkg/client"
 	"github.com/idasilva/chdb-dump/pkg/context"
 	"github.com/idasilva/chdb-dump/pkg/persistence"
 
@@ -12,26 +11,26 @@ import (
 
 type Data struct {
 	logger  *zap.Logger
+	client  client.Client
 	storage persistence.Storage
 }
 
-func (d *Data) Backup() {
-	defer d.logger.Sync()
+func (d *Data) Exec() error {
+	d.logger.Info("start backup data...")
 
-	t := time.Now()
-	d.logger.Info(t.Format("20060102150405"))
+	docs, err := d.client.AllDocs()
+	if err != nil {
+		return err
+	}
 
-	//# Grab our data from couchdb
+	err = d.storage.Store(docs)
+	if err != nil {
+		return err
+	}
 
-	// # Check for export errors
+	d.logger.Info("end backup data...")
 
-}
-
-func (d *Data) Store() {
-	defer d.logger.Sync()
-
-	t := time.Now()
-	d.logger.Info(t.Format("20060102150405"))
+	return nil
 
 }
 
@@ -46,11 +45,13 @@ func New(context *context.Context) (*Data, error) {
 		return &Data{
 			logger:  logger,
 			storage: persistence.NewLocal(),
+			client:  client.New(),
 		}, nil
 	}
 
 	return &Data{
 		logger:  logger,
 		storage: persistence.NewS3(),
+		client:  client.New(),
 	}, nil
 }

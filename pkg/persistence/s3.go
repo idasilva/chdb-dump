@@ -15,7 +15,7 @@ type S3 struct {
 	filename string
 }
 
-func (s3 *S3) Store() {
+func (s3 *S3) Store(docs string) error {
 	uploader := s3manager.NewUploader(s3.session)
 
 	_, err := uploader.Upload(&s3manager.UploadInput{
@@ -27,6 +27,8 @@ func (s3 *S3) Store() {
 	if err != nil {
 		s3.logger.Fatal("FATAL")
 	}
+
+	return nil
 }
 
 func NewS3() Storage {

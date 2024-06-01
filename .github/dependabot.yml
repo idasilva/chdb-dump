@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/luffy/services/go"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "go:"
+    open-pull-requests-limit: 6
+    reviewers:
+    - idasilva
+    assignees:
+    - idasilva
