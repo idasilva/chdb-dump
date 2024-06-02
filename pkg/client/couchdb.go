@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"os"
 
@@ -16,9 +17,9 @@ type couchdb struct {
 	logger *zap.Logger
 }
 
-func (c *couchdb) AllDocs() (string, error) {
+func (c *couchdb) AllDocs(database string) (string, error) {
 	c.logger.Info("get all docs...")
-	rows := c.client.DB("docs").AllDocs(context.TODO(), kivik.IncludeDocs())
+	rows := c.client.DB(database).AllDocs(context.TODO(), kivik.IncludeDocs())
 
 	var docs []Document
 	for rows.Next() {
@@ -44,7 +45,7 @@ func (c *couchdb) AllDocs() (string, error) {
 	}
 
 	c.logger.Info("end get all docs...",
-		zap.String("data", string(jsonData)),
+		zap.String("data", base64.RawStdEncoding.EncodeToString(jsonData)),
 	)
 
 	return string(jsonData), nil

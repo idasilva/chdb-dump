@@ -7,5 +7,5 @@ type Document struct {
 }
 
 type Client interface {
-	AllDocs() (string, error)
+	AllDocs(database string) (string, error)
 }

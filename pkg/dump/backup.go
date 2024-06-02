@@ -10,20 +10,21 @@ import (
 )
 
 type Data struct {
-	logger  *zap.Logger
-	client  client.Client
-	storage persistence.Storage
+	logger   *zap.Logger
+	client   client.Client
+	storage  persistence.Storage
+	database string
 }
 
 func (d *Data) Exec() error {
 	d.logger.Info("start backup data...")
 
-	docs, err := d.client.AllDocs()
+	docs, err := d.client.AllDocs(d.database)
 	if err != nil {
 		return err
 	}
 
-	err = d.storage.Store(docs)
+	err = d.storage.Store(d.database, docs)
 	if err != nil {
 		return err
 	}
@@ -41,17 +42,22 @@ func New(context *context.Context) (*Data, error) {
 		zap.String("type", context.Persistence),
 	)
 
-	if context.Persistence == persistence.LC {
+	if context.Database == "" {
+		return nil, errDatabaseNotFound
+	}
+
+	loadFunction := func(persistence persistence.Storage) (*Data, error) {
 		return &Data{
-			logger:  logger,
-			storage: persistence.NewLocal(),
-			client:  client.New(),
+			logger:   logger,
+			storage:  persistence,
+			client:   client.New(),
+			database: context.Database,
 		}, nil
 	}
 
-	return &Data{
-		logger:  logger,
-		storage: persistence.NewS3(),
-		client:  client.New(),
-	}, nil
+	if context.Persistence == persistence.LC {
+		return loadFunction(persistence.NewLocal())
+	}
+
+	return loadFunction(persistence.NewS3())
 }

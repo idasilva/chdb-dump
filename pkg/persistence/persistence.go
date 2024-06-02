@@ -5,5 +5,5 @@ const (
 )
 
 type Storage interface {
-	Store(docs string) error
+	Store(database, docs string) error
 }

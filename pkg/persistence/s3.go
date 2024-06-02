@@ -15,7 +15,7 @@ type S3 struct {
 	filename string
 }
 
-func (s3 *S3) Store(docs string) error {
+func (s3 *S3) Store(database, docs string) error {
 	uploader := s3manager.NewUploader(s3.session)
 
 	_, err := uploader.Upload(&s3manager.UploadInput{

@@ -6,11 +6,13 @@ import (
 
 	"github.com/idasilva/chdb-dump/pkg/context"
 	"github.com/idasilva/chdb-dump/pkg/dump"
+	"github.com/idasilva/chdb-dump/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
 type backupOpts struct {
 	persistence string
+	database    string
 }
 
 type backupCmd struct {
@@ -26,10 +28,12 @@ func (r *backupCmd) execute() {
 }
 
 func newBackupCmd() *backupCmd {
+	logger := logger.New()
+
 	backup := &backupCmd{}
 	cmd := &cobra.Command{
 		Use:           "backup",
-		Aliases:       []string{"c"},
+		Aliases:       []string{"b"},
 		Short:         "backup couchdb database",
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -38,15 +42,16 @@ func newBackupCmd() *backupCmd {
 
 			dump, err := dump.New(&context.Context{
 				Persistence: backup.opts.persistence,
+				Database:    backup.opts.database,
 			})
 
 			if err != nil {
-				return err
+				logger.Fatal(err.Error())
 			}
 
 			err = dump.Exec()
 			if err != nil {
-				return err
+				logger.Fatal(err.Error())
 			}
 
 			return nil
@@ -55,6 +60,9 @@ func newBackupCmd() *backupCmd {
 
 	cmd.PersistentFlags().StringVarP(&backup.opts.persistence,
 		"persistence", "p", "local", "where you need to pull your data")
+
+	cmd.PersistentFlags().StringVarP(&backup.opts.database,
+		"database", "d", "", "which database you need to backup")
 
 	backup.cmd = cmd
 	return backup
