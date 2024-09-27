@@ -55,7 +55,7 @@ func NewBackup(context *context.Context) (*Data, error) {
 		return &Data{
 			logger:   logger,
 			storage:  persistence,
-			client:   client.New(),
+			client:   client.New(1),
 			database: context.Database,
 		}, nil
 	}

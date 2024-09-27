@@ -66,10 +66,17 @@ func (d *DataTo) Exec() error {
 	d.logger.Info("len of documents",
 		zap.Int("docCount", len(docs)))
 
-	// _ = d.client.PutDocs("", docs)
-	// if err != nil {
-	// 	return err
-	// }
+	for name, data := range docs {
+		d.logger.Info("some infos",
+			zap.String("name", name),
+		)
+		_ = d.client.PutDocs(name, data)
+		if err != nil {
+			return err
+		}
+
+	}
+
 	return nil
 
 }
@@ -85,7 +92,7 @@ func NewRestore(context *context.Context) (*DataTo, error) {
 		return &DataTo{
 			logger:  logger,
 			storage: persistence,
-			client:  client.New(),
+			client:  client.New(2),
 		}, nil
 	}
 

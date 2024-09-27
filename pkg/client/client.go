@@ -2,7 +2,7 @@ package client
 
 type Document struct {
 	ID   string                 `json:"_id"`
-	Rev  string                 `json:"_rev"`
+	Rev  string                 `json:"_rev,omitempty"`
 	Data map[string]interface{} `json:"data"`
 }
 
