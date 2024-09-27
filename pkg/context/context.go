@@ -2,5 +2,5 @@ package context
 
 type Context struct {
 	Persistence string
-	Database    string
+	Database    []string
 }

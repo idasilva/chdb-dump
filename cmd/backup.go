@@ -12,7 +12,7 @@ import (
 
 type backupOpts struct {
 	persistence string
-	database    string
+	database    []string
 }
 
 type backupCmd struct {
@@ -40,7 +40,7 @@ func newBackupCmd() *backupCmd {
 		Args:          cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			dump, err := dump.New(&context.Context{
+			dump, err := dump.NewBackup(&context.Context{
 				Persistence: backup.opts.persistence,
 				Database:    backup.opts.database,
 			})
@@ -61,8 +61,8 @@ func newBackupCmd() *backupCmd {
 	cmd.PersistentFlags().StringVarP(&backup.opts.persistence,
 		"persistence", "p", "local", "where you need to pull your data")
 
-	cmd.PersistentFlags().StringVarP(&backup.opts.database,
-		"database", "d", "", "which database you need to backup")
+	cmd.PersistentFlags().StringSliceVarP(&backup.opts.database,
+		"database", "d", []string{}, "which database you need to backup")
 
 	backup.cmd = cmd
 	return backup

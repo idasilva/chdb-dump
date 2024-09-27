@@ -31,6 +31,11 @@ func (s3 *S3) Store(database, docs string) error {
 	return nil
 }
 
+func (s3 *S3) Get(database, docs string) error {
+	s3.logger.Info("getting all docs to restore...")
+	return nil
+}
+
 func NewS3() Storage {
 	logger := logger.New()
 	session := session.Must(session.NewSession())

@@ -8,4 +8,5 @@ type Document struct {
 
 type Client interface {
 	AllDocs(database string) (string, error)
+	PutDocs(database string, docs []Document) error
 }

@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"os"
 
@@ -18,7 +17,8 @@ type couchdb struct {
 }
 
 func (c *couchdb) AllDocs(database string) (string, error) {
-	c.logger.Info("get all docs...")
+	c.logger.Info("getting all docs...",
+		zap.String("dbName", database))
 	rows := c.client.DB(database).AllDocs(context.TODO(), kivik.IncludeDocs())
 
 	var docs []Document
@@ -44,18 +44,39 @@ func (c *couchdb) AllDocs(database string) (string, error) {
 		return "", err
 	}
 
-	c.logger.Info("end get all docs...",
-		zap.String("data", base64.RawStdEncoding.EncodeToString(jsonData)),
-	)
+	c.logger.Info("end get all docs...")
 
 	return string(jsonData), nil
+}
 
+func (c *couchdb) PutDocs(database string, docs []Document) error {
+	c.logger.Info("Inserting documents into target database...",
+		zap.String("dbName", database))
+
+	for _, doc := range docs {
+		// Insert each document into the target database
+		_, err := c.client.DB(database).Put(context.TODO(), doc.ID, doc.Data)
+		if err != nil {
+			c.logger.Warn("Failed to insert document",
+				zap.String("docID", doc.ID),
+				zap.String("targetDatabase", database),
+				zap.Error(err))
+			continue
+		}
+
+		c.logger.Info("Document inserted successfully",
+			zap.String("docID", doc.ID),
+			zap.String("targetDatabase", database))
+	}
+
+	c.logger.Info("All documents inserted successfully.")
+	return nil
 }
 
 func New() Client {
 	logger := logger.New()
 
-	client, err := kivik.New("couch", os.Getenv("COUCHDB_URL"))
+	client, err := kivik.New("couch", os.Getenv("COUCHDB_BACKUP_URL"))
 	if err != nil {
 		logger.Fatal(err.Error())
 		panic(err)
